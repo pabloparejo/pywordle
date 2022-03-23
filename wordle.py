@@ -16,6 +16,12 @@ word = choice([
 rounds = 0;
 found = False;
 
+used_chars = {
+	CORRECT: set(),
+	PRESENT: set(),
+	NOT_FOUND: set()
+}
+
 while not found and rounds <= ROUNDS:
 	correct_chars_count = 0
 	guess_status = [NOT_FOUND] * WORD_LEN;
@@ -34,11 +40,19 @@ while not found and rounds <= ROUNDS:
 		if char == word[index]:
 			char_count[char] -= 1
 			guess_status[index] = CORRECT
+			used_chars[CORRECT].add(char)
+			try:
+				used_chars[PRESENT].remove(char)
+			except KeyError:
+				pass
 
 	for (index, char) in enumerate(guess):
 		if char in word and guess_status[index] == NOT_FOUND and char_count[char] > 0:
 			char_count[char] -= 1
 			guess_status[index] = PRESENT
+			used_chars[PRESENT].add(char)
+		elif not char in word:
+			used_chars[NOT_FOUND].add(char)
 
 	word_to_print = ''
 	for (index, status) in enumerate(guess_status):
@@ -56,6 +70,16 @@ while not found and rounds <= ROUNDS:
 		found = True
 	else:
 		rounds += 1
+		help = ''
+		if len(used_chars[CORRECT]) > 0:
+			help += 'Correct: {} {} {} \t'.format(Back.GREEN, f' {Style.RESET_ALL} {Back.GREEN} '.join(sorted(used_chars[CORRECT])), Style.RESET_ALL)
+		if len(used_chars[PRESENT]) > 0:
+			help += 'Present: {} {} {} \t'.format(Back.YELLOW, f' {Style.RESET_ALL} {Back.YELLOW} '.join(sorted(used_chars[PRESENT])), Style.RESET_ALL)
+		if len(used_chars[NOT_FOUND]) > 0:
+			help += 'Not found: {} {} {}'.format(Back.RED, f' {Style.RESET_ALL} {Back.RED} '.join(sorted(used_chars[NOT_FOUND])), Style.RESET_ALL)
+
+		print('\r\n' + help)
+	
 
 print()
 if found:
