@@ -12,14 +12,7 @@ word = choice([
 rounds = 0;
 found = False;
 
-chars_count = {}
-
 while not found and rounds <= 6:
-	for char in word:
-		if char in chars_count.keys():
-			chars_count[char] += 1;
-		else:
-			chars_count[char] = 1;
 	word_to_print = ''
 	found_chars = 0
 	guess = input('Dime una palabra: ').upper()
